@@ -12,6 +12,14 @@ Deadline Lifeline is an AI-powered productivity companion that continuously answ
 
 The app ranks tasks by urgency, effort, deadline proximity, blockers, and consequence. It then generates a rescue strategy, recommends next actions, schedules work blocks, and supports calendar export. Instead of merely reminding the user, it actively converts vague obligations into a plan that can be executed today.
 
+## Why It Matters
+
+Before Deadline Lifeline, a user has scattered deadlines and passive reminders. After using it, the app identifies the highest-risk commitment, explains why it matters, creates a timed rescue schedule, and gives exportable calendar actions. The user leaves with an execution plan, not another notification.
+
+## Agent Loop
+
+Deadline Lifeline runs an agent loop: ingest tasks, classify urgency and blockers, score deadline risk, choose the next best action, generate focus blocks, expose calendar actions, then re-plan when the user adds tasks or asks Lifeline a new instruction.
+
 ## Key Features
 
 - Rescue Queue for urgent and at-risk work.
@@ -35,14 +43,15 @@ The app ranks tasks by urgency, effort, deadline proximity, blockers, and conseq
 - **Gemini API:** structured JSON planning endpoint for task prioritization and next-action generation.
 - **Google Gen AI SDK:** official JavaScript SDK integration through `@google/genai`.
 - **Google Calendar:** generated calendar event links and downloadable `.ics` focus blocks.
-- **Google Cloud Run:** required deployment target for the public application link.
+- **Firebase Hosting:** public Google-hosted deployment for the judging link.
+- **Cloud Run-ready backend:** Express API and Dockerfile are included for billing-enabled Cloud Run deployment.
 
 ## Evaluation Fit
 
-- **Problem Solving & Impact:** addresses missed deadlines by converting reminders into action.
-- **Agentic Depth:** reasons over task context, risk, blockers, effort, and schedule capacity.
-- **Innovation & Creativity:** combines rescue planning, calendar export, and behavioral nudges.
-- **Usage of Google Technologies:** Gemini API and Google Cloud Run are core parts of the build.
+- **Problem Solving & Impact:** converts scattered deadlines into a ranked rescue plan and scheduled work blocks.
+- **Agentic Depth:** follows an observe-score-plan-act-replan loop over task context, risk, blockers, effort, and schedule capacity.
+- **Innovation & Creativity:** combines rescue planning, behavioral nudges, Google Calendar actions, and habit momentum.
+- **Usage of Google Technologies:** Gemini API, Google Gen AI SDK, Firebase Hosting, Google Calendar links, and Cloud Run-ready packaging are core parts of the build.
 - **Product Experience & Design:** dashboard-first interface with a polished Rescue Queue and AI Plan.
-- **Technical Implementation:** full-stack app with resilient API fallback, structured model output, and Cloud Run packaging.
+- **Technical Implementation:** full-stack app with resilient API fallback, structured model output, Firebase deploy, and Cloud Run packaging.
 - **Completeness & Usability:** public deploy remains usable even without live Gemini credentials.

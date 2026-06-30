@@ -6,6 +6,7 @@ import {
   Clock3,
   Cloud,
   Download,
+  ExternalLink,
   Flame,
   Goal,
   LayoutDashboard,
@@ -25,7 +26,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { createFocusBlock, createTask, fetchDashboard, requestAiPlan, updateTask } from './api'
 import { createDemoPlan, demoDashboard } from './demoData'
-import { blockRange, downloadIcs, formatDateTime, taskDeadlineLabel } from './format'
+import { blockRange, downloadIcs, formatDateTime, googleCalendarUrl, taskDeadlineLabel } from './format'
 import type { AiPlan, FocusBlock, Habit, Task, Urgency } from './types'
 
 const urgencyLabels: Record<Urgency, string> = {
@@ -158,7 +159,7 @@ function RescueQueue({
             <span className={`priority-dot ${task.urgency}`} />
             <span className="task-main">
               <strong>{task.title}</strong>
-              <small>{task.category} · {taskDeadlineLabel(task)} · {task.effortMinutes}m</small>
+              <small>{task.category} - {taskDeadlineLabel(task)} - {task.effortMinutes}m</small>
             </span>
             <span className={`urgency ${task.urgency}`}>{urgencyLabels[task.urgency]}</span>
             <span
@@ -190,10 +191,12 @@ function SelectedTaskPanel({
   task,
   onSchedule,
   onExport,
+  onOpenCalendar,
 }: {
   task: Task
   onSchedule: () => void
   onExport: () => void
+  onOpenCalendar: () => void
 }) {
   return (
     <section className="panel selected-task-panel">
@@ -218,7 +221,7 @@ function SelectedTaskPanel({
       {task.blockers.length > 0 && (
         <div className="blockers">
           <Flame size={16} />
-          <span>{task.blockers.join(' · ')}</span>
+          <span>{task.blockers.join(' - ')}</span>
         </div>
       )}
       <div className="action-row">
@@ -228,7 +231,11 @@ function SelectedTaskPanel({
         </button>
         <button className="secondary-button" type="button" onClick={onExport}>
           <Download size={17} />
-          <span>Export to Calendar</span>
+          <span>Download .ics</span>
+        </button>
+        <button className="secondary-button" type="button" onClick={onOpenCalendar}>
+          <ExternalLink size={17} />
+          <span>Open Google Calendar</span>
         </button>
       </div>
     </section>
@@ -322,7 +329,7 @@ function Timeline({ focusBlocks, tasks }: { focusBlocks: FocusBlock[]; tasks: Ta
               <span className="timeline-time">{lane.time}</span>
               <div className={`timeline-block mode-${block?.mode ?? 'quick'}`}>
                 <strong>{block?.title ?? lane.label}</strong>
-                <span>{task?.category ?? lane.label} · {block ? blockRange(block) : 'Open'}</span>
+                <span>{task?.category ?? lane.label} - {block ? blockRange(block) : 'Open'}</span>
               </div>
             </div>
           )
@@ -354,7 +361,7 @@ function HabitPanel({
             <span className="habit-check">{habit.doneToday > 0 ? <CheckCircle2 size={17} /> : <Circle size={17} />}</span>
             <span>
               <strong>{habit.label}</strong>
-              <small>{habit.streak} day streak · {habit.target}</small>
+              <small>{habit.streak} day streak - {habit.target}</small>
             </span>
             <b>{habit.doneToday}</b>
           </button>
@@ -563,6 +570,14 @@ export default function App() {
     }
   }
 
+  function handleOpenCalendar() {
+    const block = focusBlocks[0] ?? plan?.focusBlocks[0]
+    if (block) {
+      window.open(googleCalendarUrl(block), '_blank', 'noopener,noreferrer')
+      setNotice('Google Calendar event opened.')
+    }
+  }
+
   function handleHabitToggle(id: string) {
     setHabits((current) =>
       current.map((habit) => (habit.id === id ? { ...habit, doneToday: habit.doneToday > 0 ? 0 : 1 } : habit)),
@@ -599,7 +614,12 @@ export default function App() {
           <div className="main-column">
             <QuickAdd onAdd={(title) => void handleAddTask(title)} />
             <RescueQueue tasks={tasks} selectedTask={selectedTask} onSelect={setSelectedTaskId} onComplete={(task) => void handleComplete(task)} />
-            <SelectedTaskPanel task={selectedTask} onSchedule={() => void handleSchedule()} onExport={handleExport} />
+            <SelectedTaskPanel
+              task={selectedTask}
+              onSchedule={() => void handleSchedule()}
+              onExport={handleExport}
+              onOpenCalendar={handleOpenCalendar}
+            />
           </div>
           <div className="plan-column">
             <AiPlanPanel plan={plan} onAddBlock={(block) => void handleSchedule(block)} isPlanning={isPlanning} />

@@ -5,9 +5,9 @@
 - Run `npm run build`.
 - Run `npm start` and verify the app opens.
 - Run `npm run smoke`.
-- Deploy to Google Cloud Run.
-- Verify the public Cloud Run URL in an incognito/private window.
-- Verify `/api/health` on the deployed URL.
+- Deploy to Google Firebase Hosting for the public judging link.
+- Verify the public Google-hosted URL in an incognito/private window.
+- For a billing-enabled Cloud Run project, optionally deploy the included Express/Docker backend and verify `/api/health`.
 - Confirm AI Plan works with Gemini credentials or demo fallback.
 - Push the final code to GitHub.
 - Create a Google Doc from `PROJECT_DESCRIPTION.md`.
@@ -15,7 +15,7 @@
 
 ## BlockseBlock Fields
 
-- Deployed Application Link: public Cloud Run URL.
+- Deployed Application Link: public Google-hosted URL.
 - GitHub Repository Link: final repository URL.
 - Project Description: public Google Doc URL.
 

@@ -13,8 +13,8 @@ export const demoDashboard: DashboardPayload = {
       status: 'at-risk',
       energy: 'deep',
       context: 'Deployable link, GitHub repo, and Google Doc must be final before BlockseBlock final submit.',
-      blockers: ['Cloud Run deploy', 'Project description doc', 'Final smoke test'],
-      steps: ['Build production bundle', 'Deploy to Google Cloud Run', 'Verify public URL', 'Submit on BlockseBlock'],
+      blockers: ['Google-hosted deploy', 'Project description doc', 'Final smoke test'],
+      steps: ['Build production bundle', 'Deploy to Google Firebase Hosting', 'Verify public URL', 'Submit on BlockseBlock'],
       completed: false,
     },
     {
@@ -99,7 +99,7 @@ export function createDemoPlan(userMessage?: string): AiPlan {
       ? `Lifeline interpreted: "${userMessage}". The hackathon submission remains the highest-risk item, so the rescue plan protects build, deploy, documentation, and final-submit time.`
       : 'Your submission task is the clear deadline risk. Protect the next two hours for build verification, then move to deployment and documentation.',
     riskScore: 86,
-    nextBestAction: 'Run the production build, fix any blocking errors, and schedule a Cloud Run deploy block immediately after.',
+    nextBestAction: 'Run the production build, fix any blocking errors, and schedule a Google-hosted deploy block immediately after.',
     priorityRationale:
       'The hackathon submission has the nearest hard deadline, the highest consequence, and multiple dependent artifacts. Lower-effort personal tasks can wait until the public deploy link is verified.',
     estimatedWin: 'A focused 90-minute build-and-deploy block should reduce deadline risk by about 45%.',
@@ -118,7 +118,7 @@ export function createDemoPlan(userMessage?: string): AiPlan {
         start: '2026-06-30T17:45:00+05:30',
         end: '2026-06-30T18:30:00+05:30',
         mode: 'admin',
-        reason: 'The deployed Google Cloud link is mandatory for evaluation.',
+        reason: 'The deployed Google-hosted link is mandatory for evaluation.',
       },
       {
         taskId: 't-google-doc',

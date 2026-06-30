@@ -64,7 +64,7 @@ const planJsonSchema = {
 const fallbackPlan = {
   summary: "Your submission task is the clear deadline risk. Protect the next two hours for build verification, then move to deployment and documentation.",
   riskScore: 86,
-  nextBestAction: "Run the production build, fix any blocking errors, and schedule a Cloud Run deploy block immediately after.",
+  nextBestAction: "Run the production build, fix any blocking errors, and schedule a Google-hosted deploy block immediately after.",
   priorityRationale: "The hackathon submission has the nearest hard deadline, the highest consequence, and multiple dependent artifacts. Lower-effort personal tasks can wait until the public deploy link is verified.",
   estimatedWin: "A focused 90-minute build-and-deploy block should reduce deadline risk by about 45%.",
   focusBlocks: [
@@ -82,7 +82,7 @@ const fallbackPlan = {
       start: "2026-06-30T17:45:00+05:30",
       end: "2026-06-30T18:30:00+05:30",
       mode: "admin",
-      reason: "The deployed Google Cloud link is mandatory for evaluation."
+      reason: "The deployed Google-hosted link is mandatory for evaluation."
     },
     {
       taskId: "t-google-doc",
@@ -187,7 +187,7 @@ export async function generatePlan(input) {
         ...fallbackPlan,
         summary: "Gemini planning could not complete, so Deadline Lifeline switched to a safe demo plan.",
         nudges: [
-          "Check GEMINI_API_KEY and GEMINI_MODEL in the Cloud Run environment.",
+          "Check GEMINI_API_KEY and GEMINI_MODEL in the deployed backend environment.",
           ...fallbackPlan.nudges.slice(0, 2)
         ]
       },

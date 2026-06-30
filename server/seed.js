@@ -10,8 +10,8 @@ export const seedTasks = [
     status: "at-risk",
     energy: "deep",
     context: "Deployable link, GitHub repo, and Google Doc must be final before BlockseBlock final submit.",
-    blockers: ["Cloud Run deploy", "Project description doc", "Final smoke test"],
-    steps: ["Build production bundle", "Deploy to Google Cloud Run", "Verify public URL", "Submit on BlockseBlock"],
+    blockers: ["Google-hosted deploy", "Project description doc", "Final smoke test"],
+    steps: ["Build production bundle", "Deploy to Google Firebase Hosting", "Verify public URL", "Submit on BlockseBlock"],
     completed: false
   },
   {

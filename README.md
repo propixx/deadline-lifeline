@@ -17,8 +17,8 @@ Deadline Lifeline is an AI-powered productivity companion for the **Last-Minute 
 - React, TypeScript, Vite
 - Node.js, Express
 - `@google/genai` for Gemini API structured planning
-- Google Cloud Run deployment target
-- Dockerfile for predictable Cloud Run builds
+- Google Firebase Hosting public deployment
+- Cloud Run-ready Dockerfile for teams with billing-enabled projects
 
 ## Local Setup
 
@@ -47,9 +47,22 @@ npm run smoke
 
 Smoke tests cover `/api/health`, `/api/tasks`, and `/api/plan`.
 
-## Google Cloud Run Deployment
+## Public Deployment
 
-Primary path using Cloud Shell or a machine with `gcloud`:
+Current public Google-hosted deployment:
+
+- https://gen-lang-client-0265064402.web.app
+
+This build is deployed on Firebase Hosting so the judging link remains public and stable even without a billing-enabled Cloud Run project. The backend is still included and Cloud Run-ready for a billing-enabled Google Cloud project.
+
+Firebase Hosting deployment:
+
+```bash
+npm run build
+npx firebase-tools deploy --only hosting --project gen-lang-client-0265064402
+```
+
+Cloud Run source deployment path:
 
 ```bash
 gcloud run deploy deadline-lifeline \
@@ -69,12 +82,13 @@ Official references:
 - Google Gen AI SDK: https://ai.google.dev/gemini-api/docs/libraries
 - Structured output: https://ai.google.dev/gemini-api/docs/structured-output
 - Cloud Run source deploy: https://cloud.google.com/run/docs/deploying-source-code
+- Firebase Hosting deploy: https://firebase.google.com/docs/hosting
 
 ## Submission Notes
 
 Submit these three links on BlockseBlock:
 
-- Public Google Cloud Run deploy URL
+- Public Google-hosted deploy URL
 - GitHub repository URL
 - Public Google Doc with the project description
 
