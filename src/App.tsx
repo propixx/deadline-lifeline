@@ -24,7 +24,8 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { createFocusBlock, createTask, fetchDashboard, requestAiPlan, updateTask } from './api'
-import { blockRange, formatDateTime, googleCalendarUrl, taskDeadlineLabel } from './format'
+import { createDemoPlan, demoDashboard } from './demoData'
+import { blockRange, downloadIcs, formatDateTime, taskDeadlineLabel } from './format'
 import type { AiPlan, FocusBlock, Habit, Task, Urgency } from './types'
 
 const urgencyLabels: Record<Urgency, string> = {
@@ -455,7 +456,9 @@ export default function App() {
         setPlan(response.plan)
         setNotice(response.plan.mode === 'gemini' ? 'Gemini plan generated.' : 'Demo rescue plan ready.')
       } catch (error) {
-        setNotice(error instanceof Error ? error.message : 'Plan request failed.')
+        const demoPlan = createDemoPlan(overrideMessage)
+        setPlan(demoPlan)
+        setNotice(error instanceof Error ? 'Static demo plan ready.' : 'Demo rescue plan ready.')
       } finally {
         setIsPlanning(false)
       }
@@ -475,7 +478,12 @@ export default function App() {
         setNotice('Dashboard loaded. Generate or adjust the AI Plan.')
       })
       .catch((error: unknown) => {
-        setNotice(error instanceof Error ? error.message : 'Could not load dashboard.')
+        if (!mounted) return
+        setTasks(demoDashboard.tasks)
+        setFocusBlocks(demoDashboard.focusBlocks)
+        setHabits(demoDashboard.habits)
+        setSelectedTaskId(demoDashboard.tasks.toSorted(taskSort)[0]?.id ?? '')
+        setNotice(error instanceof Error ? 'Google-hosted static demo loaded.' : 'Demo dashboard loaded.')
       })
     return () => {
       mounted = false
@@ -490,41 +498,68 @@ export default function App() {
 
   async function handleAddTask(title: string) {
     const due = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString()
-    const response = await createTask({
+    const localTask: Task = {
+      id: `t-${crypto.randomUUID()}`,
       title,
       category: 'Inbox',
       due,
+      effortMinutes: 30,
+      urgency: 'medium',
+      priority: 62,
+      status: 'ready',
+      energy: 'light',
       context: 'Quick-captured by the user. Lifeline should clarify and schedule it.',
-    })
-    setTasks(response.tasks)
-    setSelectedTaskId(response.task.id)
+      blockers: [],
+      steps: ['Clarify next action', 'Schedule focus block'],
+      completed: false,
+    }
+    try {
+      const response = await createTask({
+        title,
+        category: 'Inbox',
+        due,
+        context: localTask.context,
+      })
+      setTasks(response.tasks)
+      setSelectedTaskId(response.task.id)
+    } catch {
+      setTasks((current) => [localTask, ...current])
+      setSelectedTaskId(localTask.id)
+    }
     setNotice('Task captured. Ask Lifeline to re-plan around it.')
   }
 
   async function handleComplete(task: Task) {
-    const response = await updateTask(task.id, {
+    const patch: Partial<Task> = {
       completed: !task.completed,
       status: task.completed ? 'ready' : 'done',
-    })
-    setTasks(response.tasks)
+    }
+    try {
+      const response = await updateTask(task.id, patch)
+      setTasks(response.tasks)
+    } catch {
+      setTasks((current) => current.map((item) => (item.id === task.id ? { ...item, ...patch } : item)))
+    }
     setNotice(task.completed ? 'Task reopened.' : 'Task marked complete. Risk reduced.')
   }
 
   async function handleSchedule(block?: FocusBlock) {
     if (!selectedTask && !block) return
-    const response = await createFocusBlock(block ?? nextHourBlock(selectedTask))
-    setFocusBlocks(response.focusBlocks)
+    const nextBlock = { ...(block ?? nextHourBlock(selectedTask)), id: block?.id ?? `fb-${crypto.randomUUID()}` }
+    try {
+      const response = await createFocusBlock(nextBlock)
+      setFocusBlocks(response.focusBlocks)
+    } catch {
+      setFocusBlocks((current) => [...current, nextBlock])
+    }
     setNotice('Focus block scheduled. Calendar export is ready.')
   }
 
   function handleExport() {
-    const firstBlock = focusBlocks[0]
-    if (firstBlock?.id) {
-      window.location.href = `/api/calendar/export?blockId=${encodeURIComponent(firstBlock.id)}`
-      return
-    }
-    if (plan?.focusBlocks[0]) {
-      window.open(googleCalendarUrl(plan.focusBlocks[0]), '_blank', 'noopener,noreferrer')
+    const block = focusBlocks[0] ?? plan?.focusBlocks[0]
+    if (block) {
+      downloadIcs(block)
+      setNotice('Calendar file downloaded.')
     }
   }
 

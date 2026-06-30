@@ -1,0 +1,160 @@
+import type { AiPlan, DashboardPayload } from './types'
+
+export const demoDashboard: DashboardPayload = {
+  tasks: [
+    {
+      id: 't-submit-hackathon',
+      title: 'Final hackathon submission',
+      category: 'Hackathon',
+      due: '2026-06-30T23:59:00+05:30',
+      effortMinutes: 180,
+      urgency: 'critical',
+      priority: 98,
+      status: 'at-risk',
+      energy: 'deep',
+      context: 'Deployable link, GitHub repo, and Google Doc must be final before BlockseBlock final submit.',
+      blockers: ['Cloud Run deploy', 'Project description doc', 'Final smoke test'],
+      steps: ['Build production bundle', 'Deploy to Google Cloud Run', 'Verify public URL', 'Submit on BlockseBlock'],
+      completed: false,
+    },
+    {
+      id: 't-google-doc',
+      title: 'Project description Google Doc',
+      category: 'Documentation',
+      due: '2026-06-30T20:30:00+05:30',
+      effortMinutes: 45,
+      urgency: 'high',
+      priority: 88,
+      status: 'planned',
+      energy: 'light',
+      context: 'Needs problem statement, solution overview, features, technologies, and Google technologies utilized.',
+      blockers: ['Make sharing anyone-with-link'],
+      steps: ['Draft content', 'Paste into Google Doc', 'Enable link sharing'],
+      completed: false,
+    },
+    {
+      id: 't-interview-prep',
+      title: 'Interview prep kit',
+      category: 'Career',
+      due: '2026-07-01T09:00:00+05:30',
+      effortMinutes: 90,
+      urgency: 'medium',
+      priority: 72,
+      status: 'ready',
+      energy: 'deep',
+      context: 'Review resume stories, two projects, and common behavioral answers.',
+      blockers: [],
+      steps: ['Pick five stories', 'Practice intro', 'Prepare questions'],
+      completed: false,
+    },
+    {
+      id: 't-electricity-bill',
+      title: 'Pay electricity bill',
+      category: 'Personal',
+      due: '2026-07-02T18:00:00+05:30',
+      effortMinutes: 15,
+      urgency: 'medium',
+      priority: 55,
+      status: 'ready',
+      energy: 'light',
+      context: 'Small but penalty-sensitive task.',
+      blockers: [],
+      steps: ['Open payment portal', 'Confirm amount', 'Save receipt'],
+      completed: false,
+    },
+  ],
+  focusBlocks: [
+    {
+      id: 'fb-ship',
+      taskId: 't-submit-hackathon',
+      title: 'Ship MVP and build',
+      start: '2026-06-30T16:00:00+05:30',
+      end: '2026-06-30T17:30:00+05:30',
+      mode: 'deep',
+      reason: 'Largest risk reduction before deployment.',
+    },
+    {
+      id: 'fb-doc',
+      taskId: 't-google-doc',
+      title: 'Submission documentation',
+      start: '2026-06-30T18:00:00+05:30',
+      end: '2026-06-30T18:45:00+05:30',
+      mode: 'admin',
+      reason: 'Required artifact before final submit.',
+    },
+  ],
+  habits: [
+    { id: 'h-focus', label: 'Deep focus', streak: 6, target: '2 blocks', doneToday: 1 },
+    { id: 'h-review', label: 'Nightly review', streak: 4, target: '10 min', doneToday: 0 },
+    { id: 'h-health', label: 'Reset break', streak: 9, target: '3 breaks', doneToday: 2 },
+  ],
+}
+
+export function createDemoPlan(userMessage?: string): AiPlan {
+  return {
+    generatedAt: new Date().toISOString(),
+    mode: 'demo',
+    model: 'gemini-3.5-flash',
+    summary: userMessage
+      ? `Lifeline interpreted: "${userMessage}". The hackathon submission remains the highest-risk item, so the rescue plan protects build, deploy, documentation, and final-submit time.`
+      : 'Your submission task is the clear deadline risk. Protect the next two hours for build verification, then move to deployment and documentation.',
+    riskScore: 86,
+    nextBestAction: 'Run the production build, fix any blocking errors, and schedule a Cloud Run deploy block immediately after.',
+    priorityRationale:
+      'The hackathon submission has the nearest hard deadline, the highest consequence, and multiple dependent artifacts. Lower-effort personal tasks can wait until the public deploy link is verified.',
+    estimatedWin: 'A focused 90-minute build-and-deploy block should reduce deadline risk by about 45%.',
+    focusBlocks: [
+      {
+        taskId: 't-submit-hackathon',
+        title: 'Build and verify production app',
+        start: '2026-06-30T16:00:00+05:30',
+        end: '2026-06-30T17:30:00+05:30',
+        mode: 'deep',
+        reason: 'Removes the largest technical uncertainty before the final submit window.',
+      },
+      {
+        taskId: 't-submit-hackathon',
+        title: 'Deploy and public smoke test',
+        start: '2026-06-30T17:45:00+05:30',
+        end: '2026-06-30T18:30:00+05:30',
+        mode: 'admin',
+        reason: 'The deployed Google Cloud link is mandatory for evaluation.',
+      },
+      {
+        taskId: 't-google-doc',
+        title: 'Finalize project description',
+        start: '2026-06-30T18:45:00+05:30',
+        end: '2026-06-30T19:30:00+05:30',
+        mode: 'quick',
+        reason: 'Documentation is required but can be completed once the product behavior is stable.',
+      },
+    ],
+    recommendations: [
+      {
+        title: 'Work backward from final submit',
+        detail: 'Reserve the last 30 minutes only for link checks and BlockseBlock final submission.',
+        impact: 'high',
+      },
+      {
+        title: 'Convert reminders into actions',
+        detail: 'Every urgent item now has one next action, one owner, and a scheduled block.',
+        impact: 'high',
+      },
+      {
+        title: 'Batch shallow tasks',
+        detail: 'Handle the Google Doc and repository cleanup in a single admin block after deploy.',
+        impact: 'medium',
+      },
+      {
+        title: 'Keep a fallback path',
+        detail: 'The app remains fully usable on Google static hosting if backend billing is unavailable.',
+        impact: 'medium',
+      },
+    ],
+    nudges: [
+      'Start with the production build before polishing copy.',
+      'Do not open BlockseBlock final submit until all three links are verified.',
+      'Put your phone away for the first focus block.',
+    ],
+  }
+}

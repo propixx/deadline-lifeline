@@ -50,3 +50,40 @@ function toUtc(value: string) {
   const date = new Date(value)
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z')
 }
+
+function escapeIcsText(value: string) {
+  return value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;')
+}
+
+export function buildIcs(block: FocusBlock) {
+  const now = toUtc(new Date().toISOString())
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Deadline Lifeline//Rescue Planner//EN',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${block.id ?? `${block.taskId}-${block.start}`}@deadline-lifeline`,
+    `DTSTAMP:${now}`,
+    `DTSTART:${toUtc(block.start)}`,
+    `DTEND:${toUtc(block.end)}`,
+    `SUMMARY:${escapeIcsText(block.title)}`,
+    `DESCRIPTION:${escapeIcsText(block.reason || 'Scheduled by Deadline Lifeline')}`,
+    'LOCATION:Deadline Lifeline',
+    'END:VEVENT',
+    'END:VCALENDAR',
+    '',
+  ].join('\r\n')
+}
+
+export function downloadIcs(block: FocusBlock) {
+  const blob = new Blob([buildIcs(block)], { type: 'text/calendar;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${block.id ?? 'deadline-lifeline-focus-block'}.ics`
+  document.body.append(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
