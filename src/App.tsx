@@ -111,9 +111,13 @@ function Header({
 }) {
   return (
     <header className="topbar">
+      <div className="date-stack">
+        <span>Tue, Jun 30</span>
+        <strong>11:59 PM hard stop</strong>
+      </div>
       <div className="search-shell">
         <Search size={18} />
-        <input aria-label="Search tasks" placeholder="Search tasks, deadlines, blockers" />
+        <input aria-label="Ask Lifeline" placeholder="Ask Lifeline to re-plan, triage, or schedule a task" />
       </div>
       <div className="topbar-actions">
         <div className={`model-chip ${mode}`}>
@@ -365,6 +369,34 @@ function HabitPanel({
             </span>
             <b>{habit.doneToday}</b>
           </button>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ActivityPanel({ plan }: { plan: AiPlan | null }) {
+  const items = [
+    ['Scanned', '4 open deadlines, 3 blocking artifacts'],
+    ['Prioritized', plan?.priorityRationale ?? 'Hard deadline, consequence, and effort drive the queue.'],
+    ['Protected', plan?.estimatedWin ?? 'Next focus block should remove the largest remaining risk.'],
+  ]
+
+  return (
+    <section className="panel activity-panel">
+      <div className="panel-heading compact">
+        <div>
+          <p className="section-label">Agent loop</p>
+          <h2>Why this plan wins</h2>
+        </div>
+        <Zap size={20} />
+      </div>
+      <div className="activity-list">
+        {items.map(([label, detail]) => (
+          <div className="activity-item" key={label}>
+            <span>{label}</span>
+            <p>{detail}</p>
+          </div>
         ))}
       </div>
     </section>
@@ -627,6 +659,7 @@ export default function App() {
           <div className="side-column">
             <Timeline focusBlocks={focusBlocks} tasks={tasks} />
             <HabitPanel habits={habits} onToggle={handleHabitToggle} />
+            <ActivityPanel plan={plan} />
             <AssistantComposer
               message={message}
               setMessage={setMessage}
